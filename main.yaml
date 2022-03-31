@@ -86,6 +86,43 @@ spec:
   ports:
   - name: "frontend-app"
     protocol: TCP
-    port: 
-    targetPort: 10800
-    nodePort: 10800
+    port:
+    targetPort: 90800
+    nodePort: 90800
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "harika-pod"
+  namespace: default
+  labels:
+    app: "harika-pod"
+spec:
+  containers:
+  - name: harika-pod
+    image: "debian-slim:latest"
+    resources:
+      limits:
+        cpu: 200m
+        memory: 500Mi
+      requests:
+        cpu: 100m
+        memory: 200Mi
+    env:
+    - name: DB_HOST
+      valueFrom:
+        configMapKeyRef:
+          name: MYAPP
+          key: DB_HOST
+    ports:
+    - containerPort:  80
+      name:  http
+    volumeMounts:
+    - name: localtime
+      mountPath: /etc/localtime
+  volumes:
+    - name: localtime
+      hostPath:
+        path: /usr/share/zoneinfo/Asia/Shanghai
+  restartPolicy: Always
